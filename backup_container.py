@@ -1,6 +1,7 @@
 import os
 import json
 import asyncio
+import tempfile
 from datetime import datetime
 from azure.storage.blob import BlobClient, ContainerClient
 
@@ -35,7 +36,7 @@ class BackupContainer:
 
     def _create_new_folder(self):
         # Creates a new folder for storing log files. Each folder represents a batch of logs.
-        new_folder_name = os.path.join(os.tempdir, self._get_date() + "-" + self._uniq_string())
+        new_folder_name = os.path.join(tempfile.gettempdir(), self._get_date() + "-" + self._uniq_string())
         os.makedirs(new_folder_name, exist_ok=True)
         self._folder_size = 0
         self.current_folder = new_folder_name
@@ -57,16 +58,15 @@ class BackupContainer:
             self._create_new_file()
 
     async def upload_files(self):
-        # Asynchronously uploads files to Azure Blob Storage.
         try:
             for file in self._files_to_upload:
                 blob_client = self._container_client.get_blob_client(file)
                 with open(file, 'rb') as data:
                     await blob_client.upload_blob(data)
-            self._context.log("Uploaded logs to back up container.")
+            self._context.info("Uploaded logs to back up container.")
             self._files_to_upload = []
         except Exception as error:
-            self._context.log.error(error)
+            self._context.error(f"Error during upload: {error}")
 
     async def write_event_to_blob(self, event, error):
         # Writes an event to a local file and queues it for upload. This is used when log sending fails.
@@ -79,4 +79,4 @@ class BackupContainer:
             if file_full_path not in self._files_to_upload:
                 self._files_to_upload.append(file_full_path)
         except Exception as error:
-            self._context.log.error(f"Error in appendFile: {error}")
+            self._context.error(f"Error in appendFile: {error}")
