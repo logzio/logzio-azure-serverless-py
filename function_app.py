@@ -27,14 +27,16 @@ MAX_RETRIES = 3
 RETRY_WAIT_FIXED = 2000  # milliseconds
 
 
-# Helper functions
+# Helper functions for log processing
 def add_timestamp(log):
+    # Add timestamp to log if 'time' field exists
     if 'time' in log:
         log['@timestamp'] = log['time']
     return log
 
 
 def delete_empty_fields_of_log(log):
+    # Remove empty fields from log
     if isinstance(log, dict):
         return {k: v for k, v in log.items() if v is not None and v != ""}
     elif isinstance(log, list):
@@ -45,17 +47,18 @@ def delete_empty_fields_of_log(log):
 
 @retry(stop_max_attempt_number=MAX_RETRIES, wait_fixed=RETRY_WAIT_FIXED)
 def send_log_to_logzio(log):
-    logzio_url = "https://listener.logz.io:8071/"
-    token = os.getenv("LOGZIO_TOKEN")  # Get token from environment variable
+    # Send log to Logz.io
+    logzio_url = os.getenv("LOGZIO_LISTENER")
+    token = os.getenv("LOGZIO_TOKEN")
     params = {"token": token, "type": "type_bar"}
     headers = {"Content-Type": "application/json"}
-
     response = requests.post(logzio_url, params=params, headers=headers, data=json.dumps(log))
     response.raise_for_status()
     logging.info(f"Sent data to Logz.io: {response.status_code}, {response.text}")
 
 
 async def process_log(log, backup_container):
+    # Process each log
     log = add_timestamp(log)
     log = delete_empty_fields_of_log(log)
     try:
@@ -71,6 +74,7 @@ app = func.FunctionApp()
 # Main function
 @app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name=os.getenv("EVENT_HUB_NAME"),
                                connection="EventHubConnectionString")
+# Main function to process EventHub messages
 async def eventhub_trigger(azeventhub: func.EventHubEvent):
     logging.info('Processing EventHub trigger')
     backup_container = BackupContainer(logging, container_client)
