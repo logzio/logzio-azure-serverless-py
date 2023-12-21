@@ -174,7 +174,7 @@
                         },
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "node"
+                            "value": "python"
                         },
                         {
                             "name": "FUNCTION_APP_EDIT_MODE",
