@@ -173,6 +173,7 @@
                 "reserved": false,
                 "httpsOnly": true,
                 "siteConfig": {
+                    "pythonVersion":"3.9",
                     "appSettings": [{
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~4"
