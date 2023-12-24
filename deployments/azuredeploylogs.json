@@ -173,6 +173,7 @@
                 "reserved": false,
                 "httpsOnly": true,
                 "siteConfig": {
+                    "linuxFxVersion": "PYTHON|3.9",
                     "appSettings": [{
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~4"
