@@ -73,7 +73,8 @@ app = func.FunctionApp()
 
 
 # Main function
-@app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name=os.getenv("EVENT_HUB_NAME"),
+# @app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name=os.getenv("EVENT_HUB_NAME"),
+@app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name=os.getenv("EventhubLogsName"),
                                connection="EventHubConnectionString")
 # Main function to process EventHub messages
 async def eventhub_trigger(azeventhub: func.EventHubEvent):
