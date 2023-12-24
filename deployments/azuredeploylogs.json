@@ -174,7 +174,6 @@
                 "httpsOnly": true,
                 "siteConfig": {
                     "linuxFxVersion": "python|3.9",
-                    "pythonVersion":"3.9",
                     "appSettings": [{
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~4"
