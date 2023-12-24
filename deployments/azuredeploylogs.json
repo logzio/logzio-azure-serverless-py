@@ -182,7 +182,7 @@
                         },
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "Python 3.9"
+                            "value": "python"
                         },
                         {
                             "name": "FUNCTION_APP_EDIT_MODE",
@@ -251,10 +251,6 @@
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(resourceId('microsoft.insights/components/', parameters('AppInsightsName')), '2020-02-02').InstrumentationKey]"
-                        },
-                        {
-                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                            "value": "~18"
                         }
                     ]
                 }
