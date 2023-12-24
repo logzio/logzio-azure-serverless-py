@@ -182,7 +182,7 @@
                         },
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "python"
+                            "value": "Python 3.9"
                         },
                         {
                             "name": "FUNCTION_APP_EDIT_MODE",
