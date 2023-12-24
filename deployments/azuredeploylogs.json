@@ -153,6 +153,9 @@
             "scale": null,
             "properties": {
                 "name": "[parameters('FunctionServerfarms')]",
+                "workerTierName": null,
+                "adminSiteName": null,
+                "hostingEnvironmentProfile": null,
                 "perSiteScaling": false,
                 "reserved": false,
                 "targetWorkerCount": 0,
@@ -173,7 +176,6 @@
                 "reserved": false,
                 "httpsOnly": true,
                 "siteConfig": {
-                    "linuxFxVersion": "python|3.9",
                     "appSettings": [{
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~4"
