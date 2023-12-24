@@ -2,6 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
         "LogzioLogsHost": {
             "defaultValue": "listener.logz.io",
             "type": "String"
@@ -58,7 +65,8 @@
         "repoURL": "https://github.com/logzio/logzio-azure-serverless-py.git",
         "branch": "master",
         "DataType": "Logs",
-        "ParseEmptyFields": "false"
+        "ParseEmptyFields": "false",
+        "endpointSuffix": "core.windows.net"
     },
     "resources": [{
             "type": "Microsoft.EventHub/namespaces",
@@ -68,8 +76,8 @@
                 "capacity": 1
             },
             "name": "[parameters('EventhubNamespace')]",
-            "apiVersion": "2018-01-01-preview",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2023-01-01-preview",
+            "location": "[parameters('location')]",
             "tags": {},
             "scale": null,
             "properties": {
@@ -87,8 +95,8 @@
             },
             "kind": "StorageV2",
             "name": "[variables('backupStorageAccounts')]",
-            "apiVersion": "2019-06-01",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2023-04-01",
+            "location": "[parameters('location')]",
             "properties": {
                 "encryption": {
                     "services": {
@@ -112,8 +120,8 @@
             },
             "kind": "StorageV2",
             "name": "[parameters('logzioAppStorageAccounts')]",
-            "apiVersion": "2019-06-01",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2023-04-01",
+            "location": "[parameters('location')]",
             "properties": {
                 "encryption": {
                     "services": {
@@ -140,14 +148,11 @@
             },
             "kind": "serverfarm",
             "name": "[parameters('FunctionServerfarms')]",
-            "apiVersion": "2020-06-01",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2023-01-01",
+            "location": "[parameters('location')]",
             "scale": null,
             "properties": {
                 "name": "[parameters('FunctionServerfarms')]",
-                "workerTierName": null,
-                "adminSiteName": null,
-                "hostingEnvironmentProfile": null,
                 "perSiteScaling": false,
                 "reserved": false,
                 "targetWorkerCount": 0,
@@ -159,8 +164,8 @@
             "type": "Microsoft.Web/sites",
             "kind": "functionapp",
             "name": "[variables('logsFunctionAppName')]",
-            "apiVersion": "2020-06-01",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2023-01-01",
+            "location": "[parameters('location')]",
             "scale": null,
             "properties": {
                 "enabled": true,
@@ -186,7 +191,7 @@
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('logzioAppStorageAccounts'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('logzioAppStorageAccounts')),'2019-06-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('logzioAppStorageAccounts'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('logzioAppStorageAccounts')),'2023-04-01').keys[0].value)]"
                         },
                         {
                             "name": "WEBSITE_CONTENTSHARE",
@@ -198,11 +203,11 @@
                         },
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('logzioAppStorageAccounts'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('logzioAppStorageAccounts')),'2019-06-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('logzioAppStorageAccounts'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('logzioAppStorageAccounts')),'2023-04-01').keys[0].value)]"
                         },
                         {
                             "name": "AzureEventHubLogsConnectionString",
-                            "value": "[listkeys(resourceId('Microsoft.EventHub/namespaces/authorizationRules', parameters('EventhubNamespace'), parameters('AuthorizationRulesSharedAccessKey')), '2017-04-01').primaryConnectionString]"
+                            "value": "[listkeys(resourceId('Microsoft.EventHub/namespaces/authorizationRules', parameters('EventhubNamespace'), parameters('AuthorizationRulesSharedAccessKey')), '2021-11-01').primaryConnectionString]"
                         },
                         {
                             "name": "ConsumergroupsLogsName",
@@ -214,7 +219,7 @@
                         },
                         {
                             "name": "LogsStorageConnectionString",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('backupStorageAccounts'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('backupStorageAccounts')),'2019-06-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('backupStorageAccounts'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('backupStorageAccounts')),'2023-04-01').keys[0].value,';EndpointSuffix=', variables('endpointSuffix'))]"
                         },
                         {
                             "name": "LogzioLogsToken",
@@ -242,7 +247,7 @@
                         },
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('microsoft.insights/components/', parameters('AppInsightsName')), '2015-05-01').InstrumentationKey]"
+                            "value": "[reference(resourceId('microsoft.insights/components/', parameters('AppInsightsName')), '2020-02-02').InstrumentationKey]"
                         },
                         {
                             "name": "WEBSITE_NODE_DEFAULT_VERSION",
@@ -252,7 +257,7 @@
                 }
             },
             "resources": [{
-                "apiVersion": "2020-06-01",
+                "apiVersion": "2023-01-01",
                 "name": "web",
                 "type": "sourcecontrols",
                 "dependsOn": [
@@ -274,8 +279,8 @@
         {
             "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
             "name": "[concat(parameters('EventhubNamespace'), '/', parameters('AuthorizationRulesSharedAccessKey'))]",
-            "apiVersion": "2017-04-01",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2023-01-01-preview",
+            "location": "[parameters('location')]",
             "scale": null,
             "properties": {
                 "rights": [
@@ -291,8 +296,8 @@
         {
             "type": "Microsoft.EventHub/namespaces/eventhubs",
             "name": "[concat(parameters('EventhubNamespace'), '/', parameters('EventhubLogsName'))]",
-            "apiVersion": "2017-04-01",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2023-01-01-preview",
+            "location": "[parameters('location')]",
             "scale": null,
             "properties": {
                 "messageRetentionInDays": 7,
@@ -306,8 +311,8 @@
         {
             "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
             "name": "[concat(parameters('EventhubNamespace'), '/', parameters('EventhubLogsName'), '/', parameters('ConsumergroupsLogsName'))]",
-            "apiVersion": "2017-04-01",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2023-01-01-preview",
+            "location": "[parameters('location')]",
             "scale": null,
             "properties": {},
             "dependsOn": [
@@ -317,7 +322,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-04-01",
+            "apiVersion": "2023-04-01",
             "name": "[concat(variables('backupStorageAccounts'), '/default/logziologsbackupcontainer')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('backupStorageAccounts'))]"
@@ -329,8 +334,8 @@
         {
             "name": "[parameters('AppInsightsName')]",
             "type": "Microsoft.Insights/components",
-            "apiVersion": "2020-02-02-preview",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2020-02-02",
+            "location": "[parameters('location')]",
             "kind": "web",
             "properties": {
               "Application_Type": "web",

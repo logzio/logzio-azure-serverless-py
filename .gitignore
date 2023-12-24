@@ -1,5 +1,6 @@
 # Local configuration files
 local.settings.json
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -23,7 +24,7 @@ dist/
 htmlcov/
 
 # Editor directories and files
-.vscode/
+
 .idea/
 *.swp
 *.swo
@@ -35,3 +36,5 @@ Thumbs.db
 # Azure Functions files
 host.json
 function.json
+
+.python_packages
