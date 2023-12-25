@@ -63,7 +63,7 @@
         }
     },
     "variables": {
-        "repoURL": "https://github.com/logzio/logzio-azure-serverless-py",
+        "repoURL": "https://github.com/logzio/logzio-azure-serverless-py.git",
         "branch": "master"
     },
     "resources": [
@@ -170,12 +170,13 @@
             "type": "Microsoft.Web/sites/sourcecontrols",
             "apiVersion": "2022-09-01",
             "name": "[concat(parameters('name'), '/web')]",
+            "kind": "string",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('name'))]"
             ],
             "properties": {
-                "repoUrl": "https://github.com/logzio/logzio-azure-serverless-py",
-                "branch": "master",
+                "repoUrl": "[variables('repoURL')]",
+                "branch": "[variables('branch')]",
                 "IsManualIntegration": true
             }
         }
