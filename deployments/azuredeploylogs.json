@@ -28,7 +28,7 @@
         },
         "linuxFxVersion": {
             "type": "String",
-            "defaultValue": "NODE|10.16"
+            "defaultValue": "PYTHON|3.8"
         },
         "sku": {
             "type": "String",
@@ -64,7 +64,7 @@
         }
     },
     "variables": {
-        "repoURL": "https://github.com/logzio/logzio-azure-serverless.git",
+        "repoURL": "https://github.com/logzio/logzio-azure-serverless-py.git",
         "branch": "master"
     },
     "resources": [
@@ -92,7 +92,7 @@
                         },
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "node"
+                            "value": "python"
                         },
                         {
                             "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
@@ -176,7 +176,7 @@
         },
         {
             "type": "Microsoft.Web/sites/sourcecontrols",
-            "apiVersion": "2018-11-01",
+            "apiVersion": "2020-06-01",
             "name": "[concat(parameters('name'), '/web')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('name'))]"
