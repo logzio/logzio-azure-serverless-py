@@ -194,10 +194,6 @@
                         {
                             "name": "DataType",
                             "value": "[variables('DataType')]"
-                        },
-                        {
-                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('microsoft.insights/components/', parameters('AppInsightsName')), '2020-02-02').InstrumentationKey]"
                         }
                     ]
                 }
