@@ -1,92 +1,81 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "subscriptionId": {
+            "type": "String"
+        },
+        "name": {
+            "type": "String"
+        },
         "location": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().location]"
+            "type": "String"
         },
-        "FunctionServerfarms": {
-            "defaultValue": "[concat('FuncAppSP', uniqueString(resourceGroup().id))]",
-            "type": "string"
+        "use32BitWorkerProcess": {
+            "type": "Bool"
         },
-        "StorageAccountName": {
-            "defaultValue": "[concat('funcstg', uniqueString(resourceGroup().id))]",
-            "type": "string"
+        "ftpsState": {
+            "type": "String"
         },
-        "repoURL": {
-            "defaultValue": "https://github.com/logzio/logzio-azure-serverless-py.git",
-            "type": "string"
+        "storageAccountName": {
+            "type": "String"
         },
-        "branch": {
-            "defaultValue": "master",
-            "type": "string"
+        "linuxFxVersion": {
+            "type": "String"
+        },
+        "sku": {
+            "type": "String"
+        },
+        "skuCode": {
+            "type": "String"
+        },
+        "workerSize": {
+            "type": "String"
+        },
+        "workerSizeId": {
+            "type": "String"
+        },
+        "numberOfWorkers": {
+            "type": "String"
+        },
+        "hostingPlanName": {
+            "type": "String"
+        },
+        "serverFarmResourceGroup": {
+            "type": "String"
+        },
+        "alwaysOn": {
+            "type": "Bool"
         },
         "AuthorizationRulesSharedAccessKey": {
-            "defaultValue": "LogzioLSharedAccessKey",
-            "type": "string"
+            "type": "String"
         },
         "EventhubLogsName": {
-            "defaultValue": "logzioeventhub",
-            "type": "string"
+            "type": "String"
         },
         "LogzioLogsHost": {
-            "defaultValue": "listener.logz.io",
-            "type": "string"
+            "type": "String"
         }
     },
-    "variables": {
-        "functionAppName": "[concat('funcapp', uniqueString(resourceGroup().id))]"
-    },
+    "variables": {},
     "resources": [
         {
-            "type": "Microsoft.Storage/storageAccounts",
-            "sku": {
-                "name": "Standard_LRS"
-            },
-            "kind": "StorageV2",
-            "name": "[parameters('StorageAccountName')]",
-            "apiVersion": "2023-04-01",
-            "location": "[parameters('location')]",
-            "properties": {
-                "encryption": {
-                    "services": {
-                        "file": {
-                            "enabled": true
-                        },
-                        "blob": {
-                            "enabled": true
-                        }
-                    },
-                    "keySource": "Microsoft.Storage"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "sku": {
-                "name": "Y1",
-                "tier": "Dynamic"
-            },
-            "kind": "functionapp",
-            "name": "[parameters('FunctionServerfarms')]",
-            "apiVersion": "2023-01-01",
-            "location": "[parameters('location')]"
-        },
-        {
             "type": "Microsoft.Web/sites",
-            "kind": "functionapp",
-            "name": "[variables('functionAppName')]",
-            "apiVersion": "2023-01-01",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('name')]",
             "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+            ],
+            "tags": {
+                "hidden-link: /app-insights-resource-id": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Insights/components/', parameters('name'))]"
+            },
+            "kind": "functionapp,linux",
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('FunctionServerfarms'))]",
+                "name": "[parameters('name')]",
                 "siteConfig": {
                     "appSettings": [
-                        {
-                            "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('StorageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName')), '2023-04-01').keys[0].value)]"
-                        },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~4"
@@ -94,6 +83,18 @@
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
                             "value": "python"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[concat(parameters('name'), 'share')]"
                         },
                         {
                             "name": "AuthorizationRulesSharedAccessKey",
@@ -107,28 +108,51 @@
                             "name": "LogzioLogsHost",
                             "value": "[parameters('LogzioLogsHost')]"
                         }
-                    ]
-                }
-            },
-            "resources": [
-                {
-                    "apiVersion": "2023-01-01",
-                    "name": "web",
-                    "type": "sourcecontrols",
-                    "properties": {
-                        "RepoUrl": "[parameters('repoURL')]",
-                        "branch": "[parameters('branch')]",
-                        "IsManualIntegration": true
+                    ],
+                    "cors": {
+                        "allowedOrigins": [
+                            "https://portal.azure.com"
+                        ]
                     },
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
-                    ]
-                }
-            ],
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]",
-                "[resourceId('Microsoft.Web/serverfarms', parameters('FunctionServerfarms'))]"
-            ]
+                    "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
+                    "ftpsState": "[parameters('ftpsState')]",
+                    "linuxFxVersion": "[parameters('linuxFxVersion')]"
+                },
+                "clientAffinityEnabled": false,
+                "httpsOnly": true,
+                "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('hostingPlanName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "Tier": "[parameters('sku')]",
+                "Name": "[parameters('skuCode')]"
+            },
+            "kind": "linux",
+            "properties": {
+                "workerSize": "[parameters('workerSize')]",
+                "workerSizeId": "[parameters('workerSizeId')]",
+                "numberOfWorkers": "[parameters('numberOfWorkers')]",
+                "reserved": true
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2022-05-01",
+            "name": "[parameters('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "minimumTlsVersion": "TLS1_2",
+                "defaultToOAuthAuthentication": true
+            }
         }
     ]
 }
