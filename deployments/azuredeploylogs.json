@@ -1,60 +1,78 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "subscriptionId": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "[subscription().subscriptionId]"
         },
         "name": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "[concat('funcapp', uniqueString(resourceGroup().id))]"
         },
         "location": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "[resourceGroup().location]"
         },
         "use32BitWorkerProcess": {
-            "type": "Bool"
+            "type": "Bool",
+            "defaultValue": false
         },
         "ftpsState": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "Disabled"
         },
         "storageAccountName": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "[concat('funcstg', uniqueString(resourceGroup().id))]"
         },
         "linuxFxVersion": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "PYTHON|3.9"
         },
         "sku": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "Dynamic"
         },
         "skuCode": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "Y1"
         },
         "workerSize": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "0"
         },
         "workerSizeId": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "0"
         },
         "numberOfWorkers": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "1"
         },
         "hostingPlanName": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "[concat('hp', uniqueString(resourceGroup().id))]"
         },
         "serverFarmResourceGroup": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "[resourceGroup().name]"
         },
         "alwaysOn": {
-            "type": "Bool"
+            "type": "Bool",
+            "defaultValue": true
         },
         "AuthorizationRulesSharedAccessKey": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "LogzioLSharedAccessKey"
         },
         "EventhubLogsName": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "logzioeventhub"
         },
         "LogzioLogsHost": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "listener.logz.io"
         }
     },
     "variables": {},
