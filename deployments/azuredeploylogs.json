@@ -21,6 +21,18 @@
         "branch": {
             "defaultValue": "master",
             "type": "string"
+        },
+        "AuthorizationRulesSharedAccessKey": {
+            "defaultValue": "LogzioLSharedAccessKey",
+            "type": "string"
+        },
+        "EventhubLogsName": {
+            "defaultValue": "logzioeventhub",
+            "type": "string"
+        },
+        "LogzioLogsHost": {
+            "defaultValue": "listener.logz.io",
+            "type": "string"
         }
     },
     "variables": {
@@ -82,6 +94,18 @@
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
                             "value": "python"
+                        },
+                        {
+                            "name": "AuthorizationRulesSharedAccessKey",
+                            "value": "[parameters('AuthorizationRulesSharedAccessKey')]"
+                        },
+                        {
+                            "name": "EventhubLogsName",
+                            "value": "[parameters('EventhubLogsName')]"
+                        },
+                        {
+                            "name": "LogzioLogsHost",
+                            "value": "[parameters('LogzioLogsHost')]"
                         }
                     ]
                 }
