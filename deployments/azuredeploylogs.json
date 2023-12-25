@@ -73,7 +73,7 @@
             "name": "[parameters('name')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "microsoft.insights/components/bar-test-serverless-test",
+                "[resourceId('Microsoft.Insights/components', parameters('AppInsightsName'))]",
                 "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
             ],
