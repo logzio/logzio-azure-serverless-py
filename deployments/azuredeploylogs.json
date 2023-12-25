@@ -92,7 +92,7 @@
                         },
                         {
                             "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                            "value": "[reference('microsoft.insights/components/bar-test-serverless-test', '2015-05-01').ConnectionString]"
+                            "value": "[concat('InstrumentationKey=', reference(resourceId('Microsoft.Insights/components', parameters('AppInsightsName')), '2020-02-02-preview').InstrumentationKey)]"
                         },
                         {
                             "name": "AzureWebJobsStorage",
