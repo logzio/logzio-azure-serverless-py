@@ -1,11 +1,7 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "subscriptionId": {
-            "type": "String",
-            "defaultValue": "[subscription().subscriptionId]"
-        },
         "name": {
             "type": "String",
             "defaultValue": "[concat('funcapp', uniqueString(resourceGroup().id))]"
@@ -57,10 +53,6 @@
         "serverFarmResourceGroup": {
             "type": "String",
             "defaultValue": "[resourceGroup().name]"
-        },
-        "alwaysOn": {
-            "type": "Bool",
-            "defaultValue": true
         }
     },
     "variables": {
@@ -78,9 +70,6 @@
                 "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
             ],
-            "tags": {
-                "hidden-link: /app-insights-resource-id": "/subscriptions/d60946e5-0964-4f50-a249-1b90c509d007/resourceGroups/bar-serverless-test/providers/Microsoft.Insights/components/bar-test-serverless-test"
-            },
             "kind": "functionapp,linux",
             "properties": {
                 "name": "[parameters('name')]",
@@ -121,10 +110,9 @@
                     "linuxFxVersion": "[parameters('linuxFxVersion')]"
                 },
                 "clientAffinityEnabled": false,
-                "virtualNetworkSubnetId": null,
                 "publicNetworkAccess": "Enabled",
                 "httpsOnly": true,
-                "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+                "serverFarmId": "[resourceId(parameters('serverFarmResourceGroup'), 'Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
             }
         },
         {
@@ -147,17 +135,14 @@
             }
         },
         {
-            "type": "microsoft.insights/components",
+            "name": "[parameters('AppInsightsName')]",
+            "type": "Microsoft.Insights/components",
             "apiVersion": "2020-02-02-preview",
-            "name": "bar-test-serverless-test",
-            "location": "eastus",
-            "dependsOn": [],
+            "location": "[resourceGroup().location]",
+            "kind": "web",
             "properties": {
-                "ApplicationId": "[parameters('name')]",
-                "Request_Source": "IbizaWebAppExtensionCreate",
-                "Flow_Type": "Redfield",
-                "Application_Type": "web",
-                "WorkspaceResourceId": "/subscriptions/d60946e5-0964-4f50-a249-1b90c509d007/resourceGroups/DefaultResourceGroup-EUS/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-d60946e5-0964-4f50-a249-1b90c509d007-EUS"
+              "Application_Type": "web",
+             "applicationId": "[parameters('AppInsightsName')]"
             }
         },
         {
