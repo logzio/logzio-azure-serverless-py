@@ -164,16 +164,8 @@
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('logzioAppStorageAccounts'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('logzioAppStorageAccounts')),'2023-04-01').keys[0].value)]"
                         },
                         {
-                            "name": "AzureEventHubLogsConnectionString",
-                            "value": "[listkeys(resourceId('Microsoft.EventHub/namespaces/authorizationRules', parameters('EventhubNamespace'), parameters('AuthorizationRulesSharedAccessKey')), '2021-11-01').primaryConnectionString]"
-                        },
-                        {
                             "name": "ConsumergroupsLogsName",
                             "value": "[parameters('ConsumergroupsLogsName')]"
-                        },
-                        {
-                            "name": "EventhubLogsName",
-                            "value": "[parameters('EventhubLogsName')]"
                         },
                         {
                             "name": "LogsStorageConnectionString",
