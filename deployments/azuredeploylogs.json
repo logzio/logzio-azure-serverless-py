@@ -28,7 +28,7 @@
         },
         "linuxFxVersion": {
             "type": "String",
-            "defaultValue": "PYTHON|3.8"
+            "defaultValue": "NODE|10.16"
         },
         "sku": {
             "type": "String",
@@ -64,7 +64,7 @@
         }
     },
     "variables": {
-        "repoURL": "https://github.com/logzio/logzio-azure-serverless-py.git",
+        "repoURL": "https://github.com/logzio/logzio-azure-serverless.git",
         "branch": "master"
     },
     "resources": [
@@ -92,7 +92,7 @@
                         },
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "python"
+                            "value": "node"
                         },
                         {
                             "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
