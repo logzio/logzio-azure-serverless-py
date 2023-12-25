@@ -7,11 +7,11 @@
             "defaultValue": "[resourceGroup().location]"
         },
         "FunctionServerfarms": {
-            "defaultValue": "[concat('FunctionAppServicePlan', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[concat('FuncAppSP', uniqueString(resourceGroup().id))]",
             "type": "string"
         },
         "StorageAccountName": {
-            "defaultValue": "[concat('funcappstorage', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[concat('funcstg', uniqueString(resourceGroup().id))]",
             "type": "string"
         },
         "repoURL": {
