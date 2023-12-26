@@ -105,6 +105,10 @@
                         {
                             "name": "WEBSITE_CONTENTSHARE",
                             "value": "[concat(toLower(parameters('name')), uniqueString(resourceGroup().id))]"
+                        },
+                        {
+                            "name": "PYTHON_ISOLATE_WORKER_DEPENDENCIES",
+                            "value": "1"
                         }
                     ],
                     "cors": {
