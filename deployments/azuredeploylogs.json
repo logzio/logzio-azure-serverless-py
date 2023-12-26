@@ -167,7 +167,7 @@
         {
             "type": "Microsoft.Web/sites/sourcecontrols",
             "apiVersion": "2022-09-01",
-            "name": "[concat(parameters('name'), '/web')]",
+            "name": "[concat(parameters('name'), '/sourcecontrols')]",
             "kind": "string",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('name'))]"
