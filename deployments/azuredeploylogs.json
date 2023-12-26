@@ -53,20 +53,20 @@
             }
         },
         "LogzioAppStorageAccounts": {
-            "type": "string",
             "defaultValue":"[concat('logzllog', uniqueString(resourceGroup().id))]",
+            "type": "string"
         },
         "EventhubNamespace": {
             "defaultValue": "[concat('LogzioLNS', uniqueString(resourceGroup().id))]",
             "type": "string"
         },
         "EventhubLogsName": {
-            "type": "string",
-            "defaultValue":"logzioeventhub"
+            "defaultValue":"logzioeventhub",
+            "type": "string"
         },
         "ConsumergroupsLogsName": {
-            "type": "string",
-            "defaultValue":"LogzioLConsumerGroup"
+            "defaultValue":"LogzioLConsumerGroup",
+            "type": "string"
         },
         "functionsWorkerProcessCount": {
             "defaultValue": 1,
