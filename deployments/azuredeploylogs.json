@@ -52,10 +52,6 @@
                 "description": "The name of the Application Insights resource."
             }
         },
-        "LogzioAppStorageAccounts": {
-            "defaultValue":"[concat('logzllog', uniqueString(resourceGroup().id))]",
-            "type": "string"
-        },
         "EventhubNamespace": {
             "defaultValue": "[concat('LogzioLNS', uniqueString(resourceGroup().id))]",
             "type": "string"
@@ -66,6 +62,10 @@
         },
         "ConsumergroupsLogsName": {
             "defaultValue":"LogzioLConsumerGroup",
+            "type": "string"
+        },
+        "LogzioAppStorageAccounts": {
+            "defaultValue":"[concat('logzllog', uniqueString(resourceGroup().id))]",
             "type": "string"
         },
         "functionsWorkerProcessCount": {
@@ -219,7 +219,7 @@
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('logzioAppStorageAccounts'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('logzioAppStorageAccounts')),'2023-04-01').keys[0].value)]"
                         },
                         {
-                            "name": "AzureEventHubLogsConnectionString",
+                            "name": "AzureWebJobsEventHubConnectionString",
                             "value": "[concat('Endpoint=sb://', parameters('EventhubNamespace'), '.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=', listKeys(resourceId('Microsoft.EventHub/namespaces/authorizationRules', parameters('EventhubNamespace'), 'RootManageSharedAccessKey'), '2023-01-01-preview').primarykey)]"
                         },
                         {
@@ -265,7 +265,7 @@
                         {
                             "name": "AzureWebJobsEventHubConnectionString",
                             "value": "[concat('Endpoint=sb://', parameters('EventhubNamespace'), '.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=<your_shared_access_key>')]"
-                        },
+                        }
                     ]
                 }
             },
