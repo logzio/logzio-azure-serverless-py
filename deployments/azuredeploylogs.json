@@ -52,21 +52,21 @@
                 "description": "The name of the Application Insights resource."
             }
         },
+        "LogzioAppStorageAccounts": {
+            "type": "string",
+            "defaultValue":"[concat('logzllog', uniqueString(resourceGroup().id))]",
+        },
         "EventhubNamespace": {
             "defaultValue": "[concat('LogzioLNS', uniqueString(resourceGroup().id))]",
             "type": "string"
         },
         "EventhubLogsName": {
-            "defaultValue":"logzioeventhub",
-            "type": "string"
+            "type": "string",
+            "defaultValue":"logzioeventhub"
         },
         "ConsumergroupsLogsName": {
-            "defaultValue":"LogzioLConsumerGroup",
-            "type": "string"
-        },
-        "LogzioAppStorageAccounts": {
-            "defaultValue":"[concat('logzllog', uniqueString(resourceGroup().id))]",
-            "type": "string"
+            "type": "string",
+            "defaultValue":"LogzioLConsumerGroup"
         },
         "functionsWorkerProcessCount": {
             "defaultValue": 1,
