@@ -76,8 +76,13 @@
         }
     },
     "variables": {
+        "logsFunctionAppName": "[concat('logzioLFunctionApp', uniqueString(resourceGroup().id))]",
+        "backupStorageAccounts": "[concat('logslbackup', uniqueString(resourceGroup().id))]",
         "repoURL": "https://github.com/logzio/logzio-azure-serverless-py.git",
-        "branch": "master"
+        "branch": "master",
+        "DataType": "Logs",
+        "ParseEmptyFields": "false",
+        "endpointSuffix": "core.windows.net"
     },
     "resources": [
         {
