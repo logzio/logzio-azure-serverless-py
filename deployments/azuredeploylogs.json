@@ -63,8 +63,8 @@
         }
     },
     "variables": {
-        "repoURL": "https://github.com/bardabun/IMSystem.git",
-        "branch": "main"
+        "repoURL": "https://github.com/logzio/logzio-azure-serverless-py.git",
+        "branch": "master"
     },
     "resources": [
         {
