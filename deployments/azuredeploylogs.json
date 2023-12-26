@@ -51,6 +51,18 @@
             "metadata": {
                 "description": "The name of the Application Insights resource."
             }
+        },
+        "EventhubNamespace": {
+            "defaultValue": "[concat('LogzioLNS', uniqueString(resourceGroup().id))]",
+            "type": "string"
+        },
+        "EventhubLogsName": {
+            "defaultValue":"logzioeventhub",
+            "type": "string"
+        },
+        "ConsumergroupsLogsName": {
+            "defaultValue":"LogzioLConsumerGroup",
+            "type": "string"
         }
     },
     "variables": {
