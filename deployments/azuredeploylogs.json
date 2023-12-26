@@ -63,8 +63,8 @@
         }
     },
     "variables": {
-        "repoURL": "https://github.com/logzio/logzio-azure-serverless-py.git",
-        "branch": "master"
+        "repoURL": "https://github.com/bardabun/IMSystem.git",
+        "branch": "main"
     },
     "resources": [
         {
@@ -104,7 +104,7 @@
                         },
                         {
                             "name": "WEBSITE_CONTENTSHARE",
-                            "value": "bar-test-serverless-test9b4e"
+                            "value": "[concat(toLower(parameters('name')), uniqueString(resourceGroup().id))]"
                         }
                     ],
                     "cors": {
