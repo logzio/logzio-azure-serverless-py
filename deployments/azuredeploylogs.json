@@ -278,7 +278,7 @@
                 {
                     "type": "sourcecontrols",
                     "apiVersion": "2022-09-01",
-                    "name": "[concat(parameters('name'), '/web')]",
+                    "name": "[concat(parameters('name'), '/sourcecontrols')]",
                     "properties": {
                         "repoUrl": "[variables('repoURL')]",
                         "branch": "[variables('branch')]",
