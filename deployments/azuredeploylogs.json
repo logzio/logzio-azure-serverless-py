@@ -50,13 +50,6 @@
         "description": "The name of the App Service Plan to use."
       }
     },
-    "PythonVersion": {
-      "defaultValue": "3.8",
-      "type": "string",
-      "metadata": {
-        "description": "The version of Python to use for the function app."
-      }
-    },
     "FunctionAppStorageAccountName": {
     "defaultValue": "[concat('fa', uniqueString(resourceGroup().id))]",
         "type": "string",
@@ -89,7 +82,7 @@
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2021-02-01",
       "name": "[parameters('StorageAccountName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "sku": {
         "name": "Standard_LRS"
       },
@@ -100,7 +93,7 @@
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2021-02-01",
       "name": "[parameters('FunctionAppStorageAccountName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "sku": {
         "name": "Standard_LRS"
       },
@@ -111,7 +104,7 @@
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2020-12-01",
       "name": "[parameters('AppServicePlanName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "sku": {
         "name": "Y1",
         "tier": "Dynamic"
@@ -124,8 +117,8 @@
       "type": "Microsoft.Web/sites",
       "apiVersion": "2020-12-01",
       "name": "[variables('FunctionAppName')]",
-      "location": "[resourceGroup().location]",
-      "kind": "functionapp",
+      "location": "[parameters('location')]",
+      "kind": "functionapp,linux",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', parameters('FunctionAppStorageAccountName'))]"
@@ -133,6 +126,8 @@
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
         "siteConfig": {
+          "pythonVersion": "3.8",
+          "linuxFxVersion": "PYTHON|3.8",
           "appSettings": [
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -141,10 +136,6 @@
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
               "value": "~4"
-            },
-            {
-              "name": "PythonVersion",
-              "value": "[parameters('PythonVersion')]"
             },
             {
               "name": "AzureWebJobsStorage",
@@ -165,9 +156,12 @@
             {
                 "name": "AzureWebJobsEventHubConnectionString",
                 "value": "[concat('Endpoint=sb://', parameters('EventhubNamespace'), '.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=', listKeys(resourceId('Microsoft.EventHub/namespaces/authorizationRules', parameters('EventhubNamespace'), 'RootManageSharedAccessKey'), '2023-01-01-preview').primarykey)]"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', parameters('AppInsightsName')), '2020-02-02-preview').InstrumentationKey]"
             }
-          ],
-          "linuxFxVersion": "[concat('PYTHON|', parameters('PythonVersion'))]"
+          ]
         }
       }
     },

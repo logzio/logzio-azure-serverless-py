@@ -50,7 +50,7 @@ def send_log_to_logzio(log):
     # logzio_url = os.getenv("LOGZIO_LISTENER")
     logzio_url = os.getenv("LogzioLogsHost")
     # token = os.getenv("LOGZIO_TOKEN")
-    token = os.getenv("LogzioLogsToken")
+    token = os.getenv("LogzioToken")
     params = {"token": token, "type": "type_bar"}
     headers = {"Content-Type": "application/json"}
     response = requests.post(logzio_url, params=params, headers=headers, data=json.dumps(log))

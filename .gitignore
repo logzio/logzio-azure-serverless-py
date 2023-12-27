@@ -32,8 +32,5 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# Azure Functions files
-host.json
-function.json
 
 .python_packages
