@@ -74,6 +74,7 @@ app = func.FunctionApp()
 
 # Main function
 # @app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name=os.getenv("EVENT_HUB_NAME"),
+@app.function_name(name="EventHubTrigger1")
 @app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name=os.getenv("EventhubLogsName"),
                                connection="AzureWebJobsEventHubConnectionString")
 # Main function to process EventHub messages
