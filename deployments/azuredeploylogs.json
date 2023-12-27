@@ -144,7 +144,7 @@
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "https://logzioblobtrigger.blob.core.windows.net/eventhub/logzio-azure-serverless-py.zip"
+              "value": "https://logzioblobtrigger.blob.core.windows.net/eventhub/logzio_function.zip"
             },
             {
               "name": "LogzioURL",
