@@ -48,7 +48,7 @@ def delete_empty_fields_of_log(log):
 def send_log_to_logzio(log):
     # Send log to Logz.io
     # logzio_url = os.getenv("LOGZIO_LISTENER")
-    logzio_url = os.getenv("LogzioLogsHost")
+    logzio_url = os.getenv("LogzioURL")
     # token = os.getenv("LOGZIO_TOKEN")
     token = os.getenv("LogzioToken")
     params = {"token": token, "type": "type_bar"}
@@ -78,6 +78,7 @@ app = func.FunctionApp()
                                connection="AzureWebJobsEventHubConnectionString")
 # Main function to process EventHub messages
 async def eventhub_trigger(azeventhub: func.EventHubEvent):
+    print("Yoooooo")
     logging.info('Processing EventHub trigger')
     backup_container = BackupContainer(logging, container_client)
 
