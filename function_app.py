@@ -92,19 +92,3 @@ async def eventhub_trigger(azeventhub: func.EventHubEvent) -> None:
 
     await backup_container.upload_files()
     logging.info('EventHub trigger processing complete')
-
-
-
-@app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name="myeventhub",
-                               connection="EventHubConnectionString") 
-def eventhub_trigger(azeventhub: func.EventHubEvent):
-    logging.info('Python EventHub trigger processed an event: %s',
-                azeventhub.get_body().decode('utf-8'))
-
-
-
-@app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name="eventhub_trigger_localy_built",
-                               connection="eventhub_trigger_localy_built") 
-def eventhub_trigger_localy_built(azeventhub: func.EventHubEvent):
-    logging.info('Python EventHub trigger processed an event: %s',
-                azeventhub.get_body().decode('utf-8'))
