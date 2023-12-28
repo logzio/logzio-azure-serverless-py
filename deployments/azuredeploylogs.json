@@ -165,6 +165,10 @@
             {
                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                 "value": "[reference(resourceId('Microsoft.Insights/components', variables('AppInsightsName')), '2020-02-02-preview').InstrumentationKey]"
+            },
+            {
+              "name": "AzureWebJobsFeatureFlags",
+              "value": "EnableWorkerIndexing"
             }
           ]
         }
