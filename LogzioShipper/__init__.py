@@ -13,9 +13,9 @@ load_dotenv()
 
 # Initialize Azure Blob Storage container client
 container_client = ContainerClient.from_connection_string(
-    conn_str=os.getenv("AzureWebJobsStorage"),
-    # conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
-    # container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
+    # conn_str=os.getenv("AzureWebJobsStorage"),
+    conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
+    container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 )
 
 # Configure logging
@@ -47,10 +47,10 @@ def delete_empty_fields_of_log(log):
 @retry(stop_max_attempt_number=MAX_RETRIES, wait_fixed=RETRY_WAIT_FIXED)
 def send_log_to_logzio(log):
     # Send log to Logz.io
-    # logzio_url = os.getenv("LOGZIO_LISTENER")
-    logzio_url = os.getenv("LogzioURL")
-    # token = os.getenv("LOGZIO_TOKEN")
-    token = os.getenv("LogzioToken")
+    logzio_url = os.getenv("LOGZIO_LISTENER")
+    # logzio_url = os.getenv("LogzioURL")
+    token = os.getenv("LOGZIO_TOKEN")
+    # token = os.getenv("LogzioToken")
     params = {"token": token, "type": "type_bar"}
     headers = {"Content-Type": "application/json"}
     response = requests.post(logzio_url, params=params, headers=headers, data=json.dumps(log))
@@ -69,16 +69,8 @@ async def process_log(log, backup_container):
         await backup_container.write_event_to_blob(log, e)
 
 
-app = func.FunctionApp()
-
-
-# Main function
-# @app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name=os.getenv("EVENT_HUB_NAME"),
-@app.function_name(name="EventHubTrigger1")
-@app.event_hub_message_trigger(arg_name="azeventhub", event_hub_name=os.getenv("EventhubLogsName"),
-                               connection="AzureWebJobsEventHubConnectionString")
 # Main function to process EventHub messages
-async def eventhub_trigger(azeventhub: func.EventHubEvent) -> None:
+async def main(azeventhub: func.EventHubEvent):
     print("Yoooooo")
     logging.info('Processing EventHub trigger')
     backup_container = BackupContainer(logging, container_client)
@@ -92,3 +84,4 @@ async def eventhub_trigger(azeventhub: func.EventHubEvent) -> None:
 
     await backup_container.upload_files()
     logging.info('EventHub trigger processing complete')
+
