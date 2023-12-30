@@ -5,6 +5,7 @@ import tempfile
 from datetime import datetime
 from azure.storage.blob import BlobClient, ContainerClient
 
+
 class BackupContainer:
     def __init__(self, internal_logger, container_client):
         # Constructor: Initializes the backup container with logging and Azure container client.

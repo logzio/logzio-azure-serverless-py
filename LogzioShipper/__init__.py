@@ -7,6 +7,7 @@ from retrying import retry
 from dotenv import load_dotenv
 from LogzioShipper.backup_container import BackupContainer
 from azure.storage.blob import ContainerClient
+from typing import List
 
 # Load environment variables
 load_dotenv()
@@ -70,17 +71,25 @@ async def process_log(log, backup_container):
 
 
 # Main function to process EventHub messages
-async def main(azeventhub: func.EventHubEvent):
-    print("Yoooooo")
+async def main(azeventhub: List[func.EventHubEvent]):
     logging.info('Processing EventHub trigger')
     backup_container = BackupContainer(logging, container_client)
 
-    for message in azeventhub.get_body().decode('utf-8').splitlines():
+    for event in azeventhub:
         try:
-            log = json.loads(message)
-            await process_log(log, backup_container)
+            # Decode the message from each event
+            message_body = event.get_body().decode('utf-8')
+            logging.info(f"Processing message: {message_body}")
+
+            for line in message_body.splitlines():
+                # Process each line in the message
+                log = json.loads(line)
+                await process_log(log, backup_container)
+
         except json.JSONDecodeError as e:
             logging.error(f"Error parsing JSON: {e}")
+        except Exception as e:
+            logging.error(f"Unexpected error processing event: {e}")
 
     await backup_container.upload_files()
     logging.info('EventHub trigger processing complete')

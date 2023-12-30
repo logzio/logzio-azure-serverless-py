@@ -1,5 +1,10 @@
 {
   "version": "2.0",
+  "extensions": {
+    "queues": {
+      "maxDequeueCount": 1
+    }
+  },
   "logging": {
     "applicationInsights": {
       "samplingSettings": {
@@ -10,6 +15,6 @@
   },
   "extensionBundle": {
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
-    "version": "[4.*, 5.0.0)"
+    "version": "[3.*, 4.0.0)"
   }
 }
