@@ -2,6 +2,15 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "StorageAccountName": {
+      "defaultValue": "logziologs",
+      "minLength": 3,
+      "maxLength": 24,
+      "type": "string",
+      "metadata": {
+        "description": "The storage account (general purpose v2) name. Must be between 3 and 24 characters in length and contains numbers and lower-case letters only."
+      }
+    },
     "ContainerName": {
       "defaultValue": "logs",
       "minLength": 3,
@@ -70,6 +79,17 @@
     "AppInsightsName": "[variables('FunctionAppName')]"
   },
   "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-02-01",
+      "name": "[parameters('StorageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {}
+    },
       {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2021-02-01",
