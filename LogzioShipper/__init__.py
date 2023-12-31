@@ -14,13 +14,13 @@ load_dotenv()
 
 # Initialize Azure Blob Storage container client
 container_client = ContainerClient.from_connection_string(
-    # conn_str=os.getenv("AzureWebJobsStorage"),
-    conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
-    container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
+    conn_str=os.getenv("AzureWebJobsStorage"),
+    # conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
+    # container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 )
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 # Retry configuration for transient errors
 MAX_RETRIES = 3
@@ -46,12 +46,12 @@ def delete_empty_fields_of_log(log):
 
 
 @retry(stop_max_attempt_number=MAX_RETRIES, wait_fixed=RETRY_WAIT_FIXED)
-def send_log_to_logzio(log):
-    # Send log to Logz.io
-    logzio_url = os.getenv("LOGZIO_LISTENER")
-    # logzio_url = os.getenv("LogzioURL")
-    token = os.getenv("LOGZIO_TOKEN")
-    # token = os.getenv("LogzioToken")
+async def send_log_to_logzio(log):
+    # Asynchronous function to send log to Logz.io
+    # logzio_url = os.getenv("LOGZIO_LISTENER")
+    logzio_url = os.getenv("LogzioURL")
+    # token = os.getenv("LOGZIO_TOKEN")
+    token = os.getenv("LogzioToken")
     params = {"token": token, "type": "type_bar"}
     headers = {"Content-Type": "application/json"}
     response = requests.post(logzio_url, params=params, headers=headers, data=json.dumps(log))
@@ -64,7 +64,7 @@ async def process_log(log, backup_container):
     log = add_timestamp(log)
     log = delete_empty_fields_of_log(log)
     try:
-        send_log_to_logzio(log)
+        await send_log_to_logzio(log)
     except Exception as e:
         logging.error(f"Failed to send log to Logz.io: {e}")
         await backup_container.write_event_to_blob(log, e)

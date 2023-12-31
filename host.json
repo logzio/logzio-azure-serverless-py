@@ -1,18 +1,16 @@
 {
   "version": "2.0",
-  "extensions": {
-    "queues": {
-      "maxDequeueCount": 1
-    }
-  },
   "logging": {
-    "applicationInsights": {
-      "samplingSettings": {
-        "isEnabled": true,
-        "excludedTypes": "Request"
-      }
-    }
+  "logLevel": {
+    "default": "Information"
   },
+  "applicationInsights": {
+    "samplingSettings": {
+      "isEnabled": true,
+      "excludedTypes": "Request"
+    }
+  }
+},
   "extensionBundle": {
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
     "version": "[3.*, 4.0.0)"
