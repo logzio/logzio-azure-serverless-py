@@ -15,15 +15,15 @@ load_dotenv()
 # Initialize Azure Blob Storage container client
 container_client = ContainerClient.from_connection_string(
     # On Azure
-    # conn_str=os.getenv("AzureWebJobsStorage"),
+    conn_str=os.getenv("AzureWebJobsStorage"),
     # On local
-    conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
+    # conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
 
     container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 )
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 # Retry configuration for transient errors
 MAX_RETRIES = 3
@@ -50,10 +50,10 @@ def delete_empty_fields_of_log(log):
 
 async def send_logs_to_logzio(logs):
     """Asynchronously sends a batch of logs to Logz.io with custom retry logic."""
-    logzio_url = os.getenv("LOGZIO_LISTENER")
-    # logzio_url = os.getenv("LogzioURL")
-    token = os.getenv("LOGZIO_TOKEN")
-    # token = os.getenv("LogzioToken")
+    # logzio_url = os.getenv("LOGZIO_LISTENER")
+    logzio_url = os.getenv("LogzioURL")
+    # token = os.getenv("LOGZIO_TOKEN")
+    token = os.getenv("LogzioToken")
     params = {"token": token, "type": "type_bar"}
     headers = {"Content-Type": "application/json"}
 
