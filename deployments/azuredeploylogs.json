@@ -20,7 +20,7 @@
         "description": "The name of the blob container within the storage account."
       }
     },
-    "LOGZIO_LISTENER": {
+    "LogzioURL": {
       "defaultValue": "https://listener.logz.io:8071",
       "type": "string",
       "allowedValues": [
@@ -36,7 +36,7 @@
         "description": "The Logz.io listener URL for your region."
       }
     },
-    "LOGZIO_TOKEN": {
+    "LogzioToken": {
       "minLength": 1,
       "type": "string",
       "metadata": {
@@ -139,7 +139,7 @@
               "value": "~4"
             },
             {
-              "name": "AZURE_STORAGE_CONNECTION_STRING",
+              "name": "AzureWebJobsStorage",
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('FunctionAppStorageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('FunctionAppStorageAccountName')), '2021-02-01').keys[0].value)]"
             },
             {
@@ -147,12 +147,12 @@
               "value": "https://logzioblobtrigger.blob.core.windows.net/eventhub/logzio_function.zip"
             },
             {
-              "name": "LOGZIO_LISTENER",
-              "value": "[parameters('LOGZIO_LISTENER')]"
+              "name": "LogzioURL",
+              "value": "[parameters('LogzioURL')]"
             },
             {
-              "name": "LOGZIO_TOKEN",
-              "value": "[parameters('LOGZIO_TOKEN')]"
+              "name": "LogzioToken",
+              "value": "[parameters('LogzioToken')]"
             },
             {
                 "name": "AzureWebJobsEventHubConnectionString",
