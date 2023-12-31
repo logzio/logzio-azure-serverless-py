@@ -129,6 +129,9 @@
         "siteConfig": {
           "pythonVersion": "3.11",
           "linuxFxVersion": "PYTHON|3.11",
+          "cors": {
+            "allowedOrigins": ["https://portal.azure.com"]
+          },
           "appSettings": [
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
