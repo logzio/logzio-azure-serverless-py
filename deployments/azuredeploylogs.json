@@ -172,6 +172,10 @@
             {
               "name": "AzureWebJobsFeatureFlags",
               "value": "EnableWorkerIndexing"
+            },
+            {
+              "name": "AZURE_STORAGE_CONTAINER_NAME",
+              "value": "[parameters('ContainerName')]"
             }
           ]
         }

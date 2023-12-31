@@ -16,7 +16,7 @@ load_dotenv()
 container_client = ContainerClient.from_connection_string(
     conn_str=os.getenv("AzureWebJobsStorage"),
     # conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
-    # container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
+    container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 )
 
 # Configure logging
