@@ -59,6 +59,9 @@ class BackupContainer:
             self._create_new_file()
 
     async def upload_files(self):
+        if not self._files_to_upload:
+            return
+
         try:
             for file in self._files_to_upload:
                 blob_client = self._container_client.get_blob_client(file)
