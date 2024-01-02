@@ -2,11 +2,14 @@ import os
 import azure.functions as func
 import logging
 import json
-import asyncio
-import aiohttp
+import requests
+from requests import Session
 from dotenv import load_dotenv
 from LogzioShipper.backup_container import BackupContainer
 from azure.storage.blob import ContainerClient
+from threading import Thread
+from queue import Queue
+import backoff
 from typing import List
 
 # Load environment variables
@@ -25,21 +28,32 @@ container_client = ContainerClient.from_connection_string(
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
-# Retry configuration for transient errors
-MAX_RETRIES = 3
-RETRY_WAIT_FIXED = 2000  # milliseconds
+# Logz.io configuration
+# LOGZIO_URL = os.getenv("LOGZIO_LISTENER")
+LOGZIO_URL = os.getenv("LogzioURL")
+# LOGZIO_TOKEN = os.getenv("LOGZIO_TOKEN")
+LOGZIO_TOKEN = os.getenv("LogzioToken")
+HEADERS = {"Content-Type": "application/json"}
+RETRY_WAIT_FIXED = 2  # seconds for retry delay
+thread_count = int(os.getenv('THREAD_COUNT', 4))
+
+# Queue for logs
+log_queue = Queue()
+
+# Backup Container
+backup_container = BackupContainer(logging, container_client)
+
+# Connection Pool (Session)
+session = Session()
 
 
-# Helper functions for log processing
 def add_timestamp(log):
-    # Add timestamp to log if 'time' field exists
     if 'time' in log:
         log['@timestamp'] = log['time']
     return log
 
 
 def delete_empty_fields_of_log(log):
-    # Remove empty fields from log
     if isinstance(log, dict):
         return {k: v for k, v in log.items() if v is not None and v != ""}
     elif isinstance(log, list):
@@ -48,74 +62,45 @@ def delete_empty_fields_of_log(log):
         return log
 
 
-async def send_logs_to_logzio(logs):
-    """Asynchronously sends a batch of logs to Logz.io with custom retry logic."""
-    # logzio_url = os.getenv("LOGZIO_LISTENER")
-    logzio_url = os.getenv("LogzioURL")
-    # token = os.getenv("LOGZIO_TOKEN")
-    token = os.getenv("LogzioToken")
-    params = {"token": token, "type": "type_bar"}
-    headers = {"Content-Type": "application/json"}
-
-    failed_logs = []
-
-    async with aiohttp.ClientSession() as session:
-        for log in logs:
-            attempts = 0
-            while attempts < MAX_RETRIES:
-                try:
-                    async with session.post(logzio_url, params=params, headers=headers, json=log) as response:
-                        if response.status == 200:
-                            logging.info(f"Sent data to Logz.io: {response.status}, {await response.text()}")
-                            break  # Exit the retry loop on success
-                        else:
-                            raise Exception(f"Logz.io response: {response.status}, {await response.text()}")
-                except Exception as e:
-                    logging.error(f"Attempt {attempts + 1} failed to send log to Logz.io: {e}")
-                    if attempts == MAX_RETRIES - 1:
-                        failed_logs.append(log)  # Add to failed logs after final attempt
-                    attempts += 1
-                    await asyncio.sleep(RETRY_WAIT_FIXED / 1000)
-
-        return failed_logs
+@backoff.on_exception(backoff.expo, requests.exceptions.RequestException, max_tries=3)
+def send_log(log):
+    response = session.post(LOGZIO_URL, params={"token": LOGZIO_TOKEN, "type": "type_log"}, headers=HEADERS, json=log)
+    response.raise_for_status()
 
 
-async def handle_log_transmission(logs, backup_container):
-    failed_logs = await send_logs_to_logzio(logs)
-    if failed_logs:
-        for log in failed_logs:
-            try:
-                await backup_container.write_event_to_blob(log, Exception("Log failed to send"))
-            except Exception as ex:
-                logging.error(f"Failed to back up log: {ex}")
-        await backup_container.upload_files()
+def log_sender():
+    while True:
+        log = log_queue.get()
+        try:
+            send_log(log)
+        except Exception as e:
+            logging.error(f"Failed to send log to Logz.io after retries: {e}")
+            backup_container.write_event_to_blob(log, e)
+        finally:
+            log_queue.task_done()
 
 
-async def process_eventhub_message(event, logs_to_send):
-    """Process a single Event Hub message and accumulate logs."""
+def start_log_senders(thread_count=4):
+    for _ in range(thread_count):
+        Thread(target=log_sender, daemon=True).start()
+
+
+def process_eventhub_message(event):
     try:
         message_body = event.get_body().decode('utf-8')
-        for line in message_body.splitlines():
-            log = json.loads(line)
-            log = add_timestamp(log)
-            log = delete_empty_fields_of_log(log)
-            logs_to_send.append(log)  # Accumulate logs
-    except json.JSONDecodeError as e:
-        logging.error(f"Error parsing JSON: {e}")
+        return [json.loads(line) for line in message_body.splitlines()]
     except Exception as e:
-        logging.error(f"Unexpected error processing event: {e}")
+        logging.error(f"Error processing EventHub message: {e}")
+        return []
 
 
-# Main function to process EventHub messages
-async def main(azeventhub: List[func.EventHubEvent]):
-    logging.info('Processing EventHub trigger')
-    backup_container = BackupContainer(logging, container_client)
-
-    logs_to_send = []
+def main(azeventhub: List[func.EventHubEvent]):
     for event in azeventhub:
-        await process_eventhub_message(event, logs_to_send)
-
-    if logs_to_send:
-        await handle_log_transmission(logs_to_send, backup_container)
-
+        logs = process_eventhub_message(event)
+        for log in logs:
+            log_queue.put(log)
     logging.info('EventHub trigger processing complete')
+
+
+# Start log sender threads
+start_log_senders(thread_count=thread_count)  # Use the thread count from the environment variable

@@ -62,7 +62,16 @@
         "metadata": {
             "description": "Location for all resources."
         }
+    },
+    "ThreadCount": {
+    "type": "int",
+    "defaultValue": 4,
+    "allowedValues": [4, 5, 6, 7, 8, 9, 10],
+    "metadata": {
+      "description": "The number of threads to use, between 4 and 10."
     }
+  }
+
   },
   "variables": {
     "functionAppId": "[resourceId('Microsoft.Web/sites', variables('FunctionAppName'))]",
@@ -147,12 +156,16 @@
                 "value": "[reference(resourceId('Microsoft.Insights/components', variables('AppInsightsName')), '2020-02-02-preview').InstrumentationKey]"
             },
             {
-              "name": "AzureWebJobsFeatureFlags",
-              "value": "EnableWorkerIndexing"
+                "name": "AzureWebJobsFeatureFlags",
+                "value": "EnableWorkerIndexing"
             },
             {
-              "name": "AZURE_STORAGE_CONTAINER_NAME",
-              "value": "[parameters('ContainerName')]"
+                "name": "AZURE_STORAGE_CONTAINER_NAME",
+                "value": "[parameters('ContainerName')]"
+            },
+            {
+              "name": "THREAD_COUNT",
+              "value": "[parameters('ThreadCount')]"
             }
           ]
         }
