@@ -64,11 +64,29 @@
         }
     },
     "ThreadCount": {
-    "type": "int",
-    "defaultValue": 4,
-    "allowedValues": [4, 5, 6, 7, 8, 9, 10],
-    "metadata": {
-      "description": "The number of threads to use, between 4 and 10."
+        "type": "int",
+        "defaultValue": 4,
+        "allowedValues": [4, 5, 6, 7, 8, 9, 10],
+        "metadata": {
+          "description": "The number of threads to use, between 4 and 10."
+    },
+    "bufferSize": {
+        "type": "int",
+        "defaultValue": 100,
+        "minValue": 50,
+        "maxValue": 500,
+        "metadata": {
+            "description": "The size of the log buffer. Minimum 50, maximum 500."
+        }
+    },
+    "intervalTime": {
+        "type": "int",
+        "defaultValue": 10000,
+        "minValue": 5000,
+        "maxValue": 60000,
+        "metadata": {
+            "description": "The interval time for sending logs in milliseconds. Minimum 5000 (5 seconds), maximum 60000 (60 seconds)."
+        }
     }
   }
 
@@ -166,6 +184,14 @@
             {
               "name": "THREAD_COUNT",
               "value": "[parameters('ThreadCount')]"
+            },
+            {
+              "name": "BUFFER_SIZE",
+              "value": "[parameters('bufferSize')]"
+            },
+            {
+              "name": "INTERVAL_TIME",
+              "value": "[parameters('intervalTime')]"
             }
           ]
         }
