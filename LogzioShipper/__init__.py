@@ -8,22 +8,18 @@ from dotenv import load_dotenv
 from LogzioShipper.backup_container import BackupContainer
 from azure.storage.blob import ContainerClient
 from threading import Thread
-from queue import Queue
+from queue import Queue, Empty
 import backoff
 from typing import List
 import time
-from queue import Empty
 
-# Load environment variables
+# Load environment variables from a .env file for local development
 load_dotenv()
 
 # Initialize Azure Blob Storage container client
 container_client = ContainerClient.from_connection_string(
-    # On Azure
-    conn_str=os.getenv("AzureWebJobsStorage"),
-    # On local
-    # conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
-
+    conn_str=os.getenv("AzureWebJobsStorage"),  # On Azure
+    # conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),  # On local
     container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 )
 
@@ -37,9 +33,9 @@ LOGZIO_URL = os.getenv("LogzioURL")
 LOGZIO_TOKEN = os.getenv("LogzioToken")
 HEADERS = {"Content-Type": "application/json"}
 RETRY_WAIT_FIXED = 2  # seconds for retry delay
-thread_count = int(os.getenv('THREAD_COUNT', 4))
 
-# Queue for batched logs
+# Thread and Queue Configuration
+thread_count = int(os.getenv('THREAD_COUNT', 4))
 batch_queue = Queue()
 
 # Backup Container
@@ -48,7 +44,7 @@ backup_container = BackupContainer(logging, container_client)
 # Connection Pool (Session)
 session = Session()
 
-# Constants for batching
+# Constants for batching logs
 BUFFER_SIZE = int(os.getenv('BUFFER_SIZE', 100))  # Batch size
 INTERVAL_TIME = int(os.getenv('INTERVAL_TIME', 10000)) / 1000  # Interval time in seconds
 
@@ -103,7 +99,6 @@ def batch_creator(azeventhub):
         print(f"Adding batch of size {len(local_log_batch)} to the sending queue.")
         batch_queue.put(list(local_log_batch))  # Put a copy of the batch
         local_log_batch.clear()  # Clear the local batch
-
 
 
 def batch_sender():
