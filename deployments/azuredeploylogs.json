@@ -125,8 +125,7 @@
     {
         "functionAppId": "[resourceId('Microsoft.Web/sites', variables('FunctionAppName'))]",
         "FunctionAppName": "[concat('logzioLFunctionApp', uniqueString(resourceGroup().id))]",
-        "AppInsightsName": "[variables('FunctionAppName')]",
-        "blobs": ["container1", "container2", "[parameters('ContainerName')]"]
+        "AppInsightsName": "[variables('FunctionAppName')]"
     },
     "resources":
     [
@@ -140,15 +139,15 @@
                 "name": "Standard_LRS"
             },
             "kind": "StorageV2",
+            "properties": {},
             "resources": [
                 {
-                    "type": "blobServices/containers",
+                    "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
                     "apiVersion": "2021-04-01",
-                    "name": "[concat('default/', variables('blobs')[copyIndex()])]",
-                    "copy": {
-                        "name": "blobIterator",
-                        "count": "[length(variables('blobs'))]"
-                    },
+                    "name": "[concat(parameters('FunctionAppStorageAccountName'), '/default/', parameters('ContainerName'))]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('FunctionAppStorageAccountName'))]"
+                    ],
                     "properties": {}
                 }
             ]
