@@ -20,8 +20,10 @@ This repository contains the Python code and instructions necessary to ship logs
 This deployment will create the following services:
 * Serverless Function App (Python-based)
 * Event Hubs Namespace
-* Function's Logs Storage Account
-* Backup Storage Account for failed shipments
+* Event Hubs Instance
+* Storage Account for:
+  - Function's Logs 
+  - Backup for failed shipments
 * App Service Plan
 * Application Insights
 
