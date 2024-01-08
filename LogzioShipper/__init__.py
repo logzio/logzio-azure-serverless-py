@@ -1,6 +1,4 @@
 import os
-import threading
-
 import azure.functions as func
 import logging
 import json
@@ -52,7 +50,7 @@ session = Session()
 
 # Constants for batching
 BUFFER_SIZE = int(os.getenv('BUFFER_SIZE', 100))  # Batch size
-INTERVAL_TIME = int(os.getenv('INTERVAL_TIME', 5000)) / 1000  # Interval time in seconds
+INTERVAL_TIME = int(os.getenv('INTERVAL_TIME', 10000)) / 1000  # Interval time in seconds
 
 
 def add_timestamp(log):
@@ -75,7 +73,7 @@ def send_batch(batch_data):
     try:
         # Join batch data to a single string before sending
         batch_str = ''.join(batch_data)
-        response = session.post(LOGZIO_URL, params={"token": LOGZIO_TOKEN, "type": "type_blb"}, headers=HEADERS,
+        response = session.post(LOGZIO_URL, params={"token": LOGZIO_TOKEN, "type": "type_log"}, headers=HEADERS,
                                 data=batch_str)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
