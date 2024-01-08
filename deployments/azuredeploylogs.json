@@ -126,7 +126,7 @@
         "functionAppId": "[resourceId('Microsoft.Web/sites', variables('FunctionAppName'))]",
         "FunctionAppName": "[concat('logzioLFunctionApp', uniqueString(resourceGroup().id))]",
         "AppInsightsName": "[variables('FunctionAppName')]",
-        "blobs": ["container1", "container2", "parameters(ContainerName)"]
+        "blobs": ["container1", "container2", "[parameters('ContainerName')]"]
     },
     "resources":
     [
