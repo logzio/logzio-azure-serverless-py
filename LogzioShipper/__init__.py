@@ -69,7 +69,7 @@ def send_batch(batch_data):
     try:
         # Join batch data to a single string before sending
         batch_str = ''.join(batch_data)
-        response = session.post(LOGZIO_URL, params={"token": LOGZIO_TOKEN, "type": "type_log"}, headers=HEADERS,
+        response = session.post(LOGZIO_URL, params={"token": LOGZIO_TOKEN, "type": "eventHub"}, headers=HEADERS,
                                 data=batch_str)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
