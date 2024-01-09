@@ -1,4 +1,6 @@
 import os
+import sys
+
 import azure.functions as func
 import logging
 import json
@@ -18,13 +20,15 @@ load_dotenv()
 
 # Initialize Azure Blob Storage container client
 container_client = ContainerClient.from_connection_string(
-    # conn_str=os.getenv("AzureWebJobsStorage"),  # On Azure
+    conn_str=os.getenv("AzureWebJobsStorage"),  # On Azure
     # conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),  # On local
     container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 )
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
 
 # Logz.io configuration
 # LOGZIO_URL = os.getenv("LOGZIO_LISTENER")
@@ -66,6 +70,7 @@ def delete_empty_fields_of_log(log):
 
 @backoff.on_exception(backoff.expo, requests.exceptions.RequestException, max_tries=3)
 def send_batch(batch_data):
+    logging.info("Starting to send batch")
     start_time = time.time()  # Start time measurement
     try:
         # Join batch data to a single string before sending
@@ -78,10 +83,11 @@ def send_batch(batch_data):
         backup_container.write_event_to_blob(batch_data, e)
     finally:
         end_time = time.time()  # End time measurement
-        logging.info(f"send_batch duration: {end_time - start_time} seconds")
+        logging.info(f"[send_batch] Duration: {end_time - start_time} seconds")
 
 
 def batch_creator(azeventhub):
+    logging.info("Starting batch creator")
     start_time = time.time()  # Start time measurement
     local_log_batch = []
     last_batch_time = time.time()
@@ -106,12 +112,13 @@ def batch_creator(azeventhub):
         local_log_batch.clear()  # Clear the local batch
 
     end_time = time.time()  # End time measurement
-    logging.info(f"batch_creator duration: {end_time - start_time} seconds")
+    logging.info(f"[batch_creator] Duration: {end_time - start_time} seconds")
 
 
 def batch_sender():
     while True:
         try:
+            # logging.info("Waiting for batch in queue")
             batch = batch_queue.get(timeout=0.1)
             if batch:
                 send_batch(batch)
@@ -121,11 +128,15 @@ def batch_sender():
 
 
 def start_batch_senders(thread_count=4):
+    logging.info(f"Starting {thread_count} batch sender threads")
     for _ in range(thread_count):
-        Thread(target=batch_sender, daemon=True).start()
+        thread = Thread(target=batch_sender, daemon=True)
+        thread.start()
+        logging.info("Batch sender thread started")
 
 
 def process_eventhub_message(event):
+    logging.info("Processing EventHub message")
     start_time = time.time()  # Start time measurement
     try:
         message_body = event.get_body().decode('utf-8')
@@ -143,12 +154,16 @@ def process_eventhub_message(event):
         return []
     finally:
         end_time = time.time()  # End time measurement
-        logging.info(f"process_eventhub_message duration: {end_time - start_time} seconds")
+        logging.info(f"[process_eventhub_message] Duration: {end_time - start_time} seconds")
 
 
 def main(azeventhub: List[func.EventHubEvent]):
-    batch_creator_thread = Thread(target=batch_creator, args=(azeventhub,), daemon=True)
-    batch_creator_thread.start()
-    start_batch_senders(thread_count=thread_count)
-    batch_creator_thread.join()
-    logging.info('EventHub trigger processing complete!')
+    logging.info("Function triggered with EventHub event")
+    try:
+        batch_creator_thread = Thread(target=batch_creator, args=(azeventhub,), daemon=True)
+        batch_creator_thread.start()
+        start_batch_senders(thread_count=thread_count)
+        batch_creator_thread.join()
+        logging.info('EventHub trigger processing complete!')
+    except Exception as e:
+        logging.error(f"Function execution error: {e}")
