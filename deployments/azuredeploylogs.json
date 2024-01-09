@@ -176,7 +176,8 @@
             "dependsOn":
             [
                 "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('FunctionAppStorageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('FunctionAppStorageAccountName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('FunctionAppStorageAccountName'), 'default', parameters('ContainerName'))]"
             ],
             "properties":
             {
