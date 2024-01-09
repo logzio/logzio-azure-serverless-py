@@ -18,7 +18,7 @@ load_dotenv()
 
 # Initialize Azure Blob Storage container client
 container_client = ContainerClient.from_connection_string(
-    conn_str=os.getenv("AzureWebJobsStorage"),  # On Azure
+    # conn_str=os.getenv("AzureWebJobsStorage"),  # On Azure
     # conn_str=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),  # On local
     container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 )
@@ -66,6 +66,7 @@ def delete_empty_fields_of_log(log):
 
 @backoff.on_exception(backoff.expo, requests.exceptions.RequestException, max_tries=3)
 def send_batch(batch_data):
+    start_time = time.time()  # Start time measurement
     try:
         # Join batch data to a single string before sending
         batch_str = ''.join(batch_data)
@@ -75,9 +76,13 @@ def send_batch(batch_data):
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to send batch: {e}")
         backup_container.write_event_to_blob(batch_data, e)
+    finally:
+        end_time = time.time()  # End time measurement
+        logging.info(f"send_batch duration: {end_time - start_time} seconds")
 
 
 def batch_creator(azeventhub):
+    start_time = time.time()  # Start time measurement
     local_log_batch = []
     last_batch_time = time.time()
     for event in azeventhub:
@@ -100,6 +105,9 @@ def batch_creator(azeventhub):
         batch_queue.put(list(local_log_batch))  # Put a copy of the batch
         local_log_batch.clear()  # Clear the local batch
 
+    end_time = time.time()  # End time measurement
+    logging.info(f"batch_creator duration: {end_time - start_time} seconds")
+
 
 def batch_sender():
     while True:
@@ -118,6 +126,7 @@ def start_batch_senders(thread_count=4):
 
 
 def process_eventhub_message(event):
+    start_time = time.time()  # Start time measurement
     try:
         message_body = event.get_body().decode('utf-8')
         logs = []
@@ -132,6 +141,9 @@ def process_eventhub_message(event):
     except Exception as e:
         logging.error(f"Error processing EventHub message: {e}")
         return []
+    finally:
+        end_time = time.time()  # End time measurement
+        logging.info(f"process_eventhub_message duration: {end_time - start_time} seconds")
 
 
 def main(azeventhub: List[func.EventHubEvent]):
