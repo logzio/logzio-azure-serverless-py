@@ -136,19 +136,33 @@
             "location": "[parameters('location')]",
             "sku":
             {
-                "name": "Standard_LRS"
+                "name": "Standard_LRS",
+                "tier": "Standard"
             },
             "kind": "StorageV2",
-            "properties": {},
+            "properties": {
+                "encryption": {
+                  "services": {
+                    "file": {
+                      "enabled": true
+                    },
+                    "blob": {
+                      "enabled": true
+                    }
+                  },
+                  "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            },
             "resources": [
                 {
-                    "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+                    "type": "blobServices/containers",
                     "apiVersion": "2021-04-01",
-                    "name": "[concat(parameters('FunctionAppStorageAccountName'), '/default/', parameters('ContainerName'))]",
+                    "name": "[concat('/default/', parameters('ContainerName'))]",
+                    "properties": {},
                     "dependsOn": [
-                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('FunctionAppStorageAccountName'))]"
-                    ],
-                    "properties": {}
+                        "[resourceId('Microsoft.Storage/storageAccounts/', parameters('FunctionAppStorageAccountName'))]"
+                    ]
                 }
             ]
         },
@@ -176,12 +190,14 @@
             "dependsOn":
             [
                 "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('FunctionAppStorageAccountName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('FunctionAppStorageAccountName'), 'default', parameters('ContainerName'))]"
+                "[resourceId('Microsoft.Insights/components/', variables('AppInsightsName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('FunctionAppStorageAccountName'))]"
             ],
             "properties":
             {
+                "enabled": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
+                "reserved": true,
                 "siteConfig":
                 {
                     "pythonVersion": "3.11",
