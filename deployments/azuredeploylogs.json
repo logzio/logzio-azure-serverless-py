@@ -136,35 +136,11 @@
             "location": "[parameters('location')]",
             "sku":
             {
-                "name": "Standard_LRS",
-                "tier": "Standard"
+                "name": "Standard_LRS"
             },
             "kind": "StorageV2",
-            "properties": {
-                "encryption": {
-                  "services": {
-                    "file": {
-                      "enabled": true
-                    },
-                    "blob": {
-                      "enabled": true
-                    }
-                  },
-                  "keySource": "Microsoft.Storage"
-                },
-                "accessTier": "Hot"
-            },
-            "resources": [
-                {
-                    "type": "blobServices/containers",
-                    "apiVersion": "2021-04-01",
-                    "name": "[concat('/default/', parameters('ContainerName'))]",
-                    "properties": {},
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Storage/storageAccounts/', parameters('FunctionAppStorageAccountName'))]"
-                    ]
-                }
-            ]
+            "properties":
+            {}
         },
         {
             "type": "Microsoft.Web/serverfarms",
@@ -190,14 +166,11 @@
             "dependsOn":
             [
                 "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
-                "[resourceId('Microsoft.Insights/components/', variables('AppInsightsName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('FunctionAppStorageAccountName'))]"
             ],
             "properties":
             {
-                "enabled": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
-                "reserved": true,
                 "siteConfig":
                 {
                     "pythonVersion": "3.11",
